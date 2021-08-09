@@ -12,24 +12,30 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 
-class App {
+public class App {
 
     public static void main(String[] args) throws Exception {
         // create a CharStream that reads from standard input
 
-        String filePath = args[0];
-        File fileInput = new File(filePath);
-        FileInputStream fileInputStream = new FileInputStream(fileInput);
+	InputStream is = System.in;
 
-
-        ANTLRInputStream input = new ANTLRInputStream(fileInputStream); 
+	if( args.length > 0 ){
+	    String filePath = args[0];
+	    File fileInput = new File(filePath);
+	    is = new FileInputStream(fileInput);
+	} 
+	    
+        ANTLRInputStream input = new ANTLRInputStream(is); 
         ArithmeticLexer lexer = new ArithmeticLexer(input); 
         CommonTokenStream tokens = new CommonTokenStream(lexer); 
         ArithmeticParser parser = new ArithmeticParser(tokens);
-        ParseTree tree = parser.file_(); // begin parsing at init rule
-        System.out.println(tree.toStringTree(parser)); // print LISP-style tree        
+        ParseTree tree = parser.file_();
+	EvalVisitor visitor = new EvalVisitor();
+	int i = visitor.visit(tree);
+	System.out.println("visitor result: i = " + i);
     }
 }
 

@@ -32,18 +32,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 grammar Arithmetic;
 
-file_ : equation* EOF;
+file_ : stat* EOF;
 
-equation
-   : expression relop expression
+stat
+   : expression NEWLINE                      # exprStat
+   | expression relop expression NEWLINE     # assignStat
    ;
 
 expression
-   :  expression  POW expression
-   |  expression  (TIMES | DIV)  expression
-   |  expression  (PLUS | MINUS) expression
-   |  LPAREN expression RPAREN
-   |  (PLUS | MINUS)* atom
+   :  expression  POW expression             # powExpr
+   |  expression  (TIMES | DIV)  expression  # multpricativeExpr
+   |  expression  (PLUS | MINUS) expression  # addtitiveExpr
+   |  LPAREN expression RPAREN               # parExpr
+   |  (PLUS | MINUS)* atom                   # unaryExpr
    ;
 
 atom
@@ -158,7 +159,12 @@ POW
    : '^'
    ;
 
+NEWLINE
+   : '\r'? '\n'
+   ;
 
 WS
-   : [ \r\n\t] + -> skip
+   : [ \t] + -> skip
    ;
+
+

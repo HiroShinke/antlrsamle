@@ -1,38 +1,64 @@
+
+
 package com.github.hiroshinke.antlrsample;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestName;
+import static org.hamcrest.Matchers.is;
+
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.TokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.Lexer;
+    
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Unit test for simple App.
  */
 public class AppTest 
-    extends TestCase
 {
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
+
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Rule
+    public TestName name = new TestName();
+
+    @Test public void test1()
     {
-        super( testName );
+	ArithmeticParser p = (ArithmeticParser)createParser("x=1+2\n");
+	ParseTree tree = p.file_();
+	EvalVisitor visitor = new EvalVisitor();
+	int i = visitor.visit(tree);
+	assertThat(i,is(3));
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
+    @Test public void test2()
     {
-        return new TestSuite( AppTest.class );
+	ArithmeticParser p = (ArithmeticParser)createParser("x");
+	ParseTree tree = p.file_();
+	assertThat(tree.toStringTree(p),
+		   is("(file_ stat (stat x) <EOF>)"));
     }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    
+    Parser createParser(String src){
+    
+        ANTLRInputStream input = new ANTLRInputStream(src); 
+        ArithmeticLexer lexer = new ArithmeticLexer(input); 
+        CommonTokenStream tokens = new CommonTokenStream(lexer); 
+        ArithmeticParser parser = new ArithmeticParser(tokens);
+
+	return parser;
     }
 }

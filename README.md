@@ -1,4 +1,7 @@
 # antlrsample
+
+[![Java CI with Maven](https://github.com/HiroShinke/antlrsample/actions/workflows/maven.yml/badge.svg)](https://github.com/HiroShinke/antlrsample/actions/workflows/maven.yml)
+
 A Sample project for antlr4 and maven.
 
 This can be used as a template for projects using antlr4 generated parser.
